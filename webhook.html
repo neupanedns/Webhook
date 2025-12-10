@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MacroDroid Webhook Sender</title>
+  </head>
+  <body>
+
+    <h3>MacroDroid Webhook Sender</h3>
+
+    <label for="webhook">Base Webhook URL:</label><br>
+    <input id="webhook" placeholder="https://trigger.macrodroid.com/xxxx/yyyy"><br><br>
+
+    <label for="var">var :</label><br>
+    <input id="var" placeholder="command"><br><br>
+   Click UI: <br>
+    <label for="x">x:</label><br>
+    <input id="x" placeholder="x value"><br><br>
+
+    <label for="y">y:</label><br>
+    <input id="y" placeholder="y value"><br><br>
+  Enter number to call <br/>
+    <label for="nbr">nbr:</label><br>
+    <input id="nbr" placeholder="nbr value"><br><br>
+   Enter Message to display <br />
+    <label for="msgbox">msgbox:</label><br>
+    <input id="msgbox" placeholder="msgbox value"><br><br>
+
+    <label for="id">id:</label><br>
+    <input id="id" placeholder="id value"><br><br>
+
+    <label for="durn">durn:</label><br>
+    <input id="durn" placeholder="durn value"><br><br>
+
+    <button onclick="sendNow()">Send</button><br><br>
+
+    <label>Quick Commands:</label><br>
+    <button onclick="quickSend('home')">Home</button>
+    <button onclick="quickSend('back')">Back</button>
+    <button onclick="quickSend('power_off')">Power Off</button><br><br>
+
+    <label>Final Link:</label>
+    <pre id="finalLink"></pre>
+
+    <script>
+      function sendNow() {
+        const base = document.getElementById('webhook').value.trim();
+        const v = document.getElementById('var').value.trim();
+        const x = document.getElementById('x').value.trim();
+        const y = document.getElementById('y').value.trim();
+        const nbr = document.getElementById('nbr').value.trim();
+        const msgbox = document.getElementById('msgbox').value.trim();
+        const id = document.getElementById('id').value.trim();
+        const durn = document.getElementById('durn').value.trim();
+
+        sendWebhook(base, {var: v, x, y, nbr, msgbox, id, durn});
+      }
+
+      function quickSend(command) {
+        const base = document.getElementById('webhook').value.trim();
+        if (!base) return alert('Enter webhook URL');
+
+        const params = {var: command};
+        // Directly send GET request with the var set
+        sendWebhook(base, params);
+      }
+
+      function sendWebhook(base, params) {
+        try {
+          const final = new URL(base + '/identifier');
+          for (const key in params) {
+            if (params[key]) final.searchParams.set(key, params[key]);
+          }
+
+          document.getElementById('finalLink').textContent = final.href;
+
+          fetch(final.href)
+            .then(r => r.text())
+            .then(t => console.log('Response:', t))
+            .catch(e => console.log('Error:', e));
+
+        } catch(e) {
+          alert('Invalid URL format');
+        }
+      }
+    </script>
+
+  </body>
+</html>
